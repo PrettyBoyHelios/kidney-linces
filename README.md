@@ -1,3 +1,6 @@
+# Enlace de YouTube
+Para ver un video explicatorio en YouTube, haz click en el siguiente [enlace](https://youtu.be/BEnC9l2NNp4).
+
 # kidney-linces
 
 CKD.py
