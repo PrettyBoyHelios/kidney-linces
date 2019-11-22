@@ -5,6 +5,7 @@ df = pd.read_csv('renal.csv')
 
 columns = ['age','bp','sg','al','su','rbc','pc','pcc','ba','bgr','bu','sc','sod','pot','hemo','pcv','wc','rc','htn','dm','cad','appet','pe','ane']
 
+
 def name_frec(filename, name, ignore=[]):
     file = pd.read_csv(filename)
     frec = {}
