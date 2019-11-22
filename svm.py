@@ -19,22 +19,10 @@ print(x_columns)
 
 X = np.array(x)
 y = np.array(y)
-lda = PCA(n_components=2)
-X_lda = lda.fit_transform(X, y)
-print("ratio: ", lda.explained_variance_ratio_)
-print(lda.score)
+clf = svm.SVC(kernel='linear', probability=True)
+clf.fit(x, y)
 
-plt.xlabel('LD1')
-plt.ylabel('LD2')
-plt.scatter(
-    X_lda[:,0],
-    X_lda[:,1],
-    c=y,
-    cmap='rainbow',
-    alpha=0.7,
-    edgecolors='b',
-    
-)
+print(clf.coef_)
 
 plt.show()
 #print(lda.predict([[4, 1, 6]]))
