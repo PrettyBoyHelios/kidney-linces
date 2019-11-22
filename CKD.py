@@ -1,4 +1,5 @@
 import pandas as pd
+import csv
 
 bp = []
 dm = []
@@ -192,6 +193,19 @@ htnP /= htnF
 dmP /= dmF
 for i in range(len(bpP)):
     bpP[i] /= bpF[i]
+with open('results\ckd.csv', mode='w') as result_file:
+    result_writer = csv.writer(result_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    result_writer.writerow(['Hombres Probabilidad',
+                            'Hombres Afrodescendientes',
+                            'Mujeres',
+                            'Mujeres Afrodescendientes',
+                            'Real'])
+    for i in range(len(clas)):
+        result_writer.writerow([probabilidad(cmale, gfrHBP, clas[i], bp[i], dm[i], htn[i]),
+                                probabilidad(cmaleB, gfrHNP, clas[i], bp[i], dm[i], htn[i]),
+                                probabilidad(cfemale, gfrMBP, clas[i], bp[i], dm[i], htn[i]),
+                                probabilidad(cfemaleB, gfrHNP, clas[i], bp[i], dm[i], htn[i]),
+                                clas[i]])
 
 print("hombres no afrodescendientes")
 casosDeseados = 0
