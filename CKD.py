@@ -30,38 +30,59 @@ gfrMNP = [0, 0, 0, 0, 0]
 gfrMNF = [0, 0, 0, 0, 0]
 
 
-"""
-sexo 0 = hombre, 1 = mujer
-raza 0 = no afrodescendiente, 1 = afrodescendiente 
-"""
+def in_ex(cP, gfrV, bpV, dmV, htnV):
+    cant = 0
+    if gfrV is not None:
+        cant += 1
+    if bpV is not None:
+        cant += 1
+    if dmV is not None:
+        cant += 1
+    if htnV is not None:
+        cant += 1
+    casos = 0
+    casosDeseados = 0
+    for i in range(len(bp)):
+        match = 0
+        if gfrV is not None:
+            if cP[i] == gfrV:
+                match += 1
+        if bpV is not None:
+            if bp[i] == bpV:
+                match += 1
+        if dmV is not None:
+            if dm[i] == dmV:
+                match += 1
+        if htnV is not None:
+            if htn[i] == htnV:
+                match += 1
+        if match == cant:
+            casos += 1
+            if clas[i] == 1:
+                casosDeseados += 1
+    return casosDeseados/casos
 
 
-def probabilidad(gfrV, sexo, raza, bpV, dmV, htnV):
-    prob = 1.0
-    if sexo == 0:
-        if raza == 0:
-            prob *= (1.0-gfrHBP[gfrV])
-        else:
-            prob *= (1.0 - gfrHNP[gfrV])
-    else:
-        if raza == 0:
-            prob *= (1.0-gfrMBP[gfrV])
-        else:
-            prob *= (1.0 - gfrMNP[gfrV])
-    print(prob)
-    prob *= (1.0 - bpP[bpV])
-    print(bpP[bpV], prob)
-    if dmV == 1:
-        prob *= (1.0 - 1.0)
-    else:
-        prob *= (1.0 - dmP)
-    print(dmP, prob)
-    if htnV == 1:
-        prob *= (1.0 - 1.0)
-    else:
-        prob *= (1.0 - htnP)
-    print(htnP, prob)
-    return 1.0 - prob
+def probabilidad(cP, gfrP, gfrV, bpV, dmV, htnV):
+    if bpP[bpV] == 1.0 or dmV == 1.0 or htnV == 1.0 or gfrP[gfrV] == 1.0:
+        return 1.0
+    prob = 0.0
+    prob += gfrP[gfrV]
+    prob += bpP[bpV]
+    prob += dmP
+    prob += htnP
+    prob -= in_ex(cP, gfrV, bpV, None, None)
+    prob -= in_ex(cP, gfrV, None, dmV, None)
+    prob -= in_ex(cP, gfrV, None, None, htnV)
+    prob -= in_ex(cP, None, bpV, dmV, None)
+    prob -= in_ex(cP, None, bpV, None, htnV)
+    prob -= in_ex(cP, None, None, dmV, htnV)
+    prob += in_ex(cP, gfrV, bpV, dmV, None)
+    prob += in_ex(cP, gfrV, bpV, None, htnV)
+    prob += in_ex(cP, gfrV, None, dmV, htnV)
+    prob += in_ex(cP, None, bpV, dmV, htnV)
+    prob -= in_ex(cP, gfrV, bpV, dmV, htnV)
+    return prob
 
 
 def sum(lista):
@@ -115,7 +136,7 @@ def eGFR(sc, k, a, age, sex, race):
            * (0.993**age) * sex * race
 
 
-file = pd.read_csv('renal.csv')
+file = pd.read_csv('datasets/renal.csv')
 for i in range(1, file['age'].size):
     _continue = False
     for sname in skip:
@@ -171,22 +192,51 @@ htnP /= htnF
 dmP /= dmF
 for i in range(len(bpP)):
     bpP[i] /= bpF[i]
-"""
+
 print("hombres no afrodescendientes")
+casosDeseados = 0
 for i in range(len(clas)):
-    print(i, clas[i], probabilidad(cmale[i], 0, 0, bp[i], dm[i], htn[i]))
+    x = probabilidad(cmale, gfrHBP, clas[i], bp[i], dm[i], htn[i])
+    if x > 0.8:
+        if clas[i] == 1:
+            casosDeseados += 1
+    else:
+        if clas[i] == 0:
+            casosDeseados += 1
+print(casosDeseados/len(clas))
 print("hombres afrodescendientes")
+casosDeseados = 0
 for i in range(len(clas)):
-    print(i, clas[i], probabilidad(cmaleB[i], 0, 1, bp[i], dm[i], htn[i]))
+    x = probabilidad(cmaleB, gfrHNP, clas[i], bp[i], dm[i], htn[i])
+    if x > 0.8:
+        if clas[i] == 1:
+            casosDeseados += 1
+    else:
+        if clas[i] == 0:
+            casosDeseados += 1
+print(casosDeseados/len(clas))
 print("mujeres no afrodescendientes")
+casosDeseados = 0
 for i in range(len(clas)):
-    print(i, clas[i], probabilidad(cfemale[i], 1, 0, bp[i], dm[i], htn[i]))
+    x = probabilidad(cfemale, gfrMBP, clas[i], bp[i], dm[i], htn[i])
+    if x > 0.8:
+        if clas[i] == 1:
+            casosDeseados += 1
+    else:
+        if clas[i] == 0:
+            casosDeseados += 1
+print(casosDeseados/len(clas))
 print("mujeres afrodescendientes")
+casosDeseados = 0
 for i in range(len(clas)):
-    print(i, clas[i], probabilidad(cfemaleB[i], 1, 1, bp[i], dm[i], htn[i]))
-"""
-print(gfrMBP, bpP, dmP, htnP)
-print(probabilidad(0, 1, 0, 0, 0, 0))
+    x = probabilidad(cfemaleB, gfrMNP, clas[i], bp[i], dm[i], htn[i])
+    if x > 0.8:
+        if clas[i] == 1:
+            casosDeseados += 1
+    else:
+        if clas[i] == 0:
+            casosDeseados += 1
+print(casosDeseados/len(clas))
 
 """
     Fuente https://www.kidney.org/content/ckd-epi-creatinine-equation-2009
